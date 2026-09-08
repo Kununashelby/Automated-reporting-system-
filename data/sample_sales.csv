@@ -1,0 +1,9 @@
+date,product,category,quantity,price,cost
+2026-08-20,Laptop,Electronics,2,80000,60000
+2026-08-20,Phone,Electronics,5,30000,22000
+2026-08-20,Mouse,Accessories,10,1500,800
+2026-08-21,Laptop,Electronics,1,80000,60000
+2026-08-21,Keyboard,Accessories,5,2500,1400
+2026-08-21,Phone,Electronics,3,30000,22000
+2026-08-22,Monitor,Electronics,2,25000,18000
+2026-08-22,Mouse,Accessories,15,1500,800
