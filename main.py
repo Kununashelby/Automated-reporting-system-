@@ -1,3 +1,4 @@
+from src.reporting.excel_report import generate_excel_report
 from src.reporting.pdf_report import generate_pdf_report
 from src.reporting.data_loader import load_csv
 from src.reporting.analyzer import analyze_sales
@@ -63,7 +64,7 @@ def main():
 
     print("\nCharts generated successfully.")
 
-        # ==============================
+    # ==============================
     # 7. GENERATE PDF REPORT
     # ==============================
 
@@ -73,6 +74,17 @@ def main():
 
     print(f"PDF report: {pdf_path}")
     print("\nPDF report generated successfully.")
+
+        # ==============================
+    # 8. GENERATE EXCEL REPORT
+    # ==============================
+
+    print("\n===== GENERATING EXCEL REPORT =====")
+
+    excel_path = generate_excel_report(results)
+
+    print(f"Excel report: {excel_path}")
+    print("\nExcel report generated successfully.")
 
 
 # ==============================
