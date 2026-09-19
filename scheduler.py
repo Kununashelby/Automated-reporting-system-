@@ -2,13 +2,16 @@ import time
 import schedule
 
 from main import main
+from src.reporting.logger import setup_logger
 
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
 
-REPORT_TIME = "18:00"
+REPORT_TIME = "23:25"
+
+logger = setup_logger()
 
 
 # ============================================================
@@ -20,26 +23,26 @@ def run_reporting_system():
     Run the complete automated reporting pipeline.
     """
 
-    print("\n")
-    print("========================================")
-    print("STARTING SCHEDULED REPORT")
-    print("========================================")
+    logger.info("=" * 60)
+    logger.info("STARTING SCHEDULED REPORT")
+    logger.info("=" * 60)
 
     try:
 
         main()
 
-        print("\n========================================")
-        print("SCHEDULED REPORT COMPLETED")
-        print("========================================")
+        logger.info("=" * 60)
+        logger.info("SCHEDULED REPORT COMPLETED SUCCESSFULLY")
+        logger.info("=" * 60)
 
     except Exception as error:
 
-        print("\n========================================")
-        print("SCHEDULED REPORT FAILED")
-        print("========================================")
+        logger.exception(
+            "SCHEDULED REPORT FAILED: %s",
+            error
+        )
 
-        print(f"Error: {error}")
+        logger.info("=" * 60)
 
 
 # ============================================================
@@ -55,15 +58,22 @@ schedule.every().day.at(REPORT_TIME).do(
 # START SCHEDULER
 # ============================================================
 
-print("========================================")
-print("AUTOMATED REPORTING SCHEDULER")
-print("========================================")
+logger.info("=" * 60)
+logger.info("AUTOMATED REPORTING SCHEDULER")
+logger.info("=" * 60)
 
-print()
-print("Scheduler is running.")
-print(f"Report time: {REPORT_TIME} every day")
-print("Press CTRL+C to stop the scheduler.")
-print()
+logger.info(
+    "Scheduler is running."
+)
+
+logger.info(
+    "Report time: %s every day",
+    REPORT_TIME
+)
+
+logger.info(
+    "Press CTRL+C to stop the scheduler."
+)
 
 
 # ============================================================
@@ -80,22 +90,17 @@ while True:
 
     except KeyboardInterrupt:
 
-        print("\n")
-        print("========================================")
-        print("SCHEDULER STOPPED")
-        print("========================================")
+        logger.info(
+            "Scheduler stopped by user."
+        )
 
         break
 
     except Exception as error:
 
-        print("\n")
-        print("========================================")
-        print("SCHEDULER ERROR")
-        print("========================================")
-
-        print(f"Error: {error}")
-
-        print("\nScheduler will continue running...")
+        logger.exception(
+            "Scheduler error: %s",
+            error
+        )
 
         time.sleep(5)
