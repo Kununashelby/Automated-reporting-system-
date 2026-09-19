@@ -9,7 +9,7 @@ from src.reporting.logger import setup_logger
 # CONFIGURATION
 # ============================================================
 
-REPORT_TIME = "23:25"
+REPORT_TIME = "18:00"
 
 logger = setup_logger()
 
