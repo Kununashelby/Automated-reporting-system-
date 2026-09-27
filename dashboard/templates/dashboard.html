@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Automated Reporting Dashboard
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            Reporting System
+        </div>
+
+        <nav>
+
+            <a
+                href="/"
+                class="active"
+            >
+                Dashboard
+            </a>
+
+            <a href="/reports">
+                Reports
+            </a>
+
+            <a href="/sales">
+                Sales
+            </a>
+
+            <a href="/history">
+                History
+            </a>
+
+            <a href="/settings">
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Dashboard
+                </h1>
+
+                <p>
+                    Automated Reporting System
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             SUMMARY CARDS
+        ================================================== -->
+
+        <section class="summary-grid">
+
+
+            <!-- REVENUE -->
+
+            <div class="card">
+
+                <span class="card-title">
+                    Total Revenue
+                </span>
+
+                <h2>
+                    KSh {{ "{:,.2f}".format(total_revenue) }}
+                </h2>
+
+            </div>
+
+
+            <!-- COST -->
+
+            <div class="card">
+
+                <span class="card-title">
+                    Total Cost
+                </span>
+
+                <h2>
+                    KSh {{ "{:,.2f}".format(total_cost) }}
+                </h2>
+
+            </div>
+
+
+            <!-- PROFIT -->
+
+            <div class="card">
+
+                <span class="card-title">
+                    Total Profit
+                </span>
+
+                <h2>
+                    KSh {{ "{:,.2f}".format(total_profit) }}
+                </h2>
+
+            </div>
+
+
+            <!-- PROFIT MARGIN -->
+
+            <div class="card">
+
+                <span class="card-title">
+                    Profit Margin
+                </span>
+
+                <h2>
+                    {{ "{:.2f}".format(profit_margin) }}%
+                </h2>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SECONDARY METRICS
+        ================================================== -->
+
+        <section class="summary-grid">
+
+
+            <div class="card">
+
+                <span class="card-title">
+                    Units Sold
+                </span>
+
+                <h2>
+                    {{ total_units }}
+                </h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <span class="card-title">
+                    Transactions
+                </span>
+
+                <h2>
+                    {{ transactions }}
+                </h2>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             CHARTS
+        ================================================== -->
+
+        <section class="charts-grid">
+
+
+            <!-- PRODUCT -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Revenue by Product
+                    </h3>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="productChart"
+                    ></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Revenue by Category
+                    </h3>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="categoryChart"
+                    ></canvas>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             REPORT HISTORY
+        ================================================== -->
+
+        <section class="panel history-panel">
+
+
+            <div class="panel-header">
+
+                <h3>
+                    Report History
+                </h3>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Records
+                            </th>
+
+                            <th>
+                                Revenue
+                            </th>
+
+                            <th>
+                                Profit
+                            </th>
+
+                            <th>
+                                Margin
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    {% for report in history %}
+
+                        <tr>
+
+                            <td>
+                                {{ report.run_time }}
+                            </td>
+
+
+                            <td>
+
+                                {% if report.status == "SUCCESS" %}
+
+                                    <span
+                                        class="status success"
+                                    >
+                                        SUCCESS
+                                    </span>
+
+                                {% else %}
+
+                                    <span
+                                        class="status failed"
+                                    >
+                                        FAILED
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ report.records_processed }}
+                            </td>
+
+
+                            <td>
+                                KSh
+                                {{
+                                    "{:,.2f}".format(
+                                        report.total_revenue
+                                    )
+                                }}
+                            </td>
+
+
+                            <td>
+                                KSh
+                                {{
+                                    "{:,.2f}".format(
+                                        report.total_profit
+                                    )
+                                }}
+                            </td>
+
+
+                            <td>
+                                {{
+                                    "{:.2f}".format(
+                                        report.profit_margin
+                                    )
+                                }}%
+                            </td>
+
+                        </tr>
+
+                    {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                            >
+                                No report history available.
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         CHART.JS
+    ====================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+
+    <!-- =====================================================
+         CHART DATA
+    ====================================================== -->
+
+    <script>
+
+        const productLabels =
+            {{ sales_by_product.keys() | list | tojson }};
+
+        const productValues =
+            {{ sales_by_product.values() | list | tojson }};
+
+
+        const categoryLabels =
+            {{ sales_by_category.keys() | list | tojson }};
+
+        const categoryValues =
+            {{ sales_by_category.values() | list | tojson }};
+
+
+        // ====================================================
+        // PRODUCT CHART
+        // ====================================================
+
+        new Chart(
+            document.getElementById(
+                "productChart"
+            ),
+            {
+
+                type: "bar",
+
+                data: {
+
+                    labels: productLabels,
+
+                    datasets: [
+                        {
+                            label: "Revenue (KSh)",
+
+                            data: productValues
+                        }
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false
+
+                }
+
+            }
+        );
+
+
+        // ====================================================
+        // CATEGORY CHART
+        // ====================================================
+
+        new Chart(
+            document.getElementById(
+                "categoryChart"
+            ),
+            {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels: categoryLabels,
+
+                    datasets: [
+                        {
+                            label: "Revenue (KSh)",
+
+                            data: categoryValues
+                        }
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

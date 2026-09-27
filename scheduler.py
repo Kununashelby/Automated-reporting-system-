@@ -3,40 +3,31 @@ import schedule
 
 from main import main
 from src.reporting.logger import setup_logger
+from src.reporting.database import (
+    create_database,
+    load_settings,
+)
 
-
-# ============================================================
-# CONFIGURATION
-# ============================================================
-
-REPORT_TIME = "18:00"
+DB_PATH = "data/reporting.db"
 
 logger = setup_logger()
 
 
-# ============================================================
-# RUN REPORTING SYSTEM
-# ============================================================
-
 def run_reporting_system():
-    """
-    Run the complete automated reporting pipeline.
-    """
-
     logger.info("=" * 60)
     logger.info("STARTING SCHEDULED REPORT")
     logger.info("=" * 60)
 
     try:
-
         main()
 
         logger.info("=" * 60)
-        logger.info("SCHEDULED REPORT COMPLETED SUCCESSFULLY")
+        logger.info(
+            "SCHEDULED REPORT COMPLETED SUCCESSFULLY"
+        )
         logger.info("=" * 60)
 
     except Exception as error:
-
         logger.exception(
             "SCHEDULED REPORT FAILED: %s",
             error
@@ -45,18 +36,81 @@ def run_reporting_system():
         logger.info("=" * 60)
 
 
-# ============================================================
-# SCHEDULE REPORT
-# ============================================================
+def load_report_settings():
+    """
+    Load the current settings from SQLite.
+    """
 
-schedule.every().day.at(REPORT_TIME).do(
-    run_reporting_system
-)
+    return load_settings(DB_PATH)
 
 
-# ============================================================
-# START SCHEDULER
-# ============================================================
+def get_report_time():
+    """
+    Get the currently configured report time.
+    """
+
+    settings = load_report_settings()
+
+    return settings.get(
+        "report_time",
+        "18:00"
+    )
+
+
+def schedule_report(report_time):
+    """
+    Schedule the report for the specified time.
+    """
+
+    schedule.clear()
+
+    schedule.every().day.at(
+        report_time
+    ).do(run_reporting_system)
+
+    logger.info(
+        "Report scheduled for %s every day.",
+        report_time
+    )
+
+
+def check_for_setting_changes(current_time):
+    """
+    Check SQLite for changes to the report time.
+    """
+
+    new_time = get_report_time()
+
+    if new_time != current_time:
+
+        logger.info(
+            "Report time changed: %s -> %s",
+            current_time,
+            new_time
+        )
+
+        schedule_report(new_time)
+
+        return new_time
+
+    return current_time
+
+
+# --------------------------------------------------
+# INITIALIZE DATABASE
+# --------------------------------------------------
+
+create_database(DB_PATH)
+
+
+# --------------------------------------------------
+# INITIAL SETTINGS
+# --------------------------------------------------
+
+current_report_time = get_report_time()
+
+schedule_report(current_report_time)
+
 
 logger.info("=" * 60)
 logger.info("AUTOMATED REPORTING SCHEDULER")
@@ -67,8 +121,12 @@ logger.info(
 )
 
 logger.info(
-    "Report time: %s every day",
-    REPORT_TIME
+    "Current report time: %s",
+    current_report_time
+)
+
+logger.info(
+    "Settings are checked automatically."
 )
 
 logger.info(
@@ -76,9 +134,9 @@ logger.info(
 )
 
 
-# ============================================================
+# --------------------------------------------------
 # SCHEDULER LOOP
-# ============================================================
+# --------------------------------------------------
 
 while True:
 
@@ -86,7 +144,11 @@ while True:
 
         schedule.run_pending()
 
-        time.sleep(1)
+        current_report_time = check_for_setting_changes(
+            current_report_time
+        )
+
+        time.sleep(5)
 
     except KeyboardInterrupt:
 

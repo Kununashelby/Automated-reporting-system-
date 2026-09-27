@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Reports | Automated Reporting System</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+
+            <h2>Reporting System</h2>
+
+        </div>
+
+
+        <nav>
+
+            <a href="/">
+                Dashboard
+            </a>
+
+            <a
+                href="/reports"
+                class="active"
+            >
+                Reports
+            </a>
+
+            <a href="/sales">
+                Sales
+            </a>
+
+            <a href="/history">
+                History
+            </a>
+
+            <a href="/settings">
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <header class="page-header">
+
+            <div>
+
+                <h1>Reports</h1>
+
+                <p>
+                    View and download generated business reports.
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- REPORT CARDS -->
+
+        <section class="reports-grid">
+
+
+            <!-- PDF -->
+
+            <div class="report-card">
+
+                <div class="report-icon">
+                    📄
+                </div>
+
+                <div class="report-info">
+
+                    <h2>Sales Report PDF</h2>
+
+                    <p>
+                        Professional PDF report containing
+                        your business performance analysis,
+                        tables and charts.
+                    </p>
+
+                    <a
+                        href="/download/pdf"
+                        class="download-button"
+                    >
+                        Download PDF
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- EXCEL -->
+
+            <div class="report-card">
+
+                <div class="report-icon">
+                    📊
+                </div>
+
+                <div class="report-info">
+
+                    <h2>Sales Report Excel</h2>
+
+                    <p>
+                        Excel workbook containing summary,
+                        product sales, category sales and
+                        raw business data.
+                    </p>
+
+                    <a
+                        href="/download/excel"
+                        class="download-button"
+                    >
+                        Download Excel
+                    </a>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- REPORT HISTORY -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>Report Generation History</h2>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>Date</th>
+
+                            <th>Status</th>
+
+                            <th>Records</th>
+
+                            <th>Revenue</th>
+
+                            <th>Profit</th>
+
+                            <th>Margin</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% if history %}
+
+                            {% for report in history %}
+
+                            <tr>
+
+                                <td>
+                                    {{ report.id }}
+                                </td>
+
+                                <td>
+                                    {{ report.run_time }}
+                                </td>
+
+                                <td>
+
+                                    {% if report.status == "SUCCESS" %}
+
+                                        <span class="status success">
+                                            SUCCESS
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status failed">
+                                            FAILED
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ report.records_processed }}
+                                </td>
+
+                                <td>
+                                    KSh
+                                    {{
+                                        "{:,.2f}".format(
+                                            report.total_revenue
+                                        )
+                                    }}
+                                </td>
+
+                                <td>
+                                    KSh
+                                    {{
+                                        "{:,.2f}".format(
+                                            report.total_profit
+                                        )
+                                    }}
+                                </td>
+
+                                <td>
+                                    {{
+                                        "{:.2f}".format(
+                                            report.profit_margin
+                                        )
+                                    }}%
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <tr>
+
+                                <td
+                                    colspan="7"
+                                    style="text-align:center;"
+                                >
+                                    No reports have been generated yet.
+                                </td>
+
+                            </tr>
+
+                        {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</body>
+
+</html>

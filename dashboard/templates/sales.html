@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Sales Analytics | Automated Reporting System</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+
+            <h2>Reporting System</h2>
+
+        </div>
+
+        <nav>
+
+            <a href="/">
+                Dashboard
+            </a>
+
+            <a href="/reports">
+                Reports
+            </a>
+
+            <a
+                href="/sales"
+                class="active"
+            >
+                Sales
+            </a>
+
+            <a href="/history">
+                History
+            </a>
+
+            <a href="/settings">
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+        <header class="page-header">
+
+            <div>
+
+                <h1>Sales Analytics</h1>
+
+                <p>
+                    Detailed analysis of your sales performance.
+                </p>
+
+            </div>
+
+        </header>
+        
+        <div class="filter-panel">
+
+    <form method="GET" action="/sales">
+
+        <div class="filter-group">
+
+            <label for="period">
+                Date Range
+            </label>
+
+            <select
+                name="period"
+                id="period"
+                onchange="toggleCustomDates()"
+            >
+
+                <option
+                    value="today"
+                    {% if selected_period == "today" %}
+                    selected
+                    {% endif %}
+                >
+                    Today
+                </option>
+
+                <option
+                    value="7"
+                    {% if selected_period == "7" %}
+                    selected
+                    {% endif %}
+                >
+                    Last 7 Days
+                </option>
+
+                <option
+                    value="30"
+                    {% if selected_period == "30" %}
+                    selected
+                    {% endif %}
+                >
+                    Last 30 Days
+                </option>
+
+                <option
+                    value="month"
+                    {% if selected_period == "month" %}
+                    selected
+                    {% endif %}
+                >
+                    This Month
+                </option>
+
+                <option
+                    value="custom"
+                    {% if selected_period == "custom" %}
+                    selected
+                    {% endif %}
+                >
+                    Custom Range
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div
+            class="custom-date-fields"
+            id="customDates"
+        >
+
+            <div class="filter-group">
+
+                <label for="start_date">
+                    From
+                </label>
+
+                <input
+                    type="date"
+                    name="start_date"
+                    id="start_date"
+                    value="{{ selected_start }}"
+                >
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="end_date">
+                    To
+                </label>
+
+                <input
+                    type="date"
+                    name="end_date"
+                    id="end_date"
+                    value="{{ selected_end }}"
+                >
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="filter-button"
+        >
+            Apply Filter
+        </button>
+
+    </form>
+
+</div>
+
+
+        <!-- SUMMARY CARDS -->
+
+        <section class="cards">
+
+            <div class="card">
+
+                <span class="card-title">
+                    Total Revenue
+                </span>
+
+                <h2>
+                    KSh
+                    {{ "{:,.2f}".format(total_revenue) }}
+                </h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <span class="card-title">
+                    Total Profit
+                </span>
+
+                <h2>
+                    KSh
+                    {{ "{:,.2f}".format(total_profit) }}
+                </h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <span class="card-title">
+                    Units Sold
+                </span>
+
+                <h2>
+                    {{ total_units }}
+                </h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <span class="card-title">
+                    Transactions
+                </span>
+
+                <h2>
+                    {{ transactions }}
+                </h2>
+
+            </div>
+
+        </section>
+
+
+        <!-- DAILY REVENUE -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>Daily Revenue</h2>
+
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="dailyRevenueChart"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRODUCT AND CATEGORY -->
+
+        <section class="charts-grid">
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>Product Performance</h2>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Product</th>
+                                <th>Revenue</th>
+                                <th>Units</th>
+                                <th>Profit</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for item in product_data %}
+
+                            <tr>
+
+                                <td>
+                                    {{ item.product }}
+                                </td>
+
+                                <td>
+                                    KSh
+                                    {{
+                                        "{:,.2f}".format(
+                                            item.revenue
+                                        )
+                                    }}
+                                </td>
+
+                                <td>
+                                    {{ item.units }}
+                                </td>
+
+                                <td>
+                                    KSh
+                                    {{
+                                        "{:,.2f}".format(
+                                            item.profit
+                                        )
+                                    }}
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>Category Performance</h2>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Category</th>
+                                <th>Revenue</th>
+                                <th>Units</th>
+                                <th>Profit</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for item in category_data %}
+
+                            <tr>
+
+                                <td>
+                                    {{ item.category }}
+                                </td>
+
+                                <td>
+                                    KSh
+                                    {{
+                                        "{:,.2f}".format(
+                                            item.revenue
+                                        )
+                                    }}
+                                </td>
+
+                                <td>
+                                    {{ item.units }}
+                                </td>
+
+                                <td>
+                                    KSh
+                                    {{
+                                        "{:,.2f}".format(
+                                            item.profit
+                                        )
+                                    }}
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- RAW SALES DATA -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>Sales Transactions</h2>
+
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Date</th>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Cost</th>
+                            <th>Revenue</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for row in sales_data %}
+
+                        <tr>
+
+                            <td>
+                                {{ row.date }}
+                            </td>
+
+                            <td>
+                                {{ row.product }}
+                            </td>
+
+                            <td>
+                                {{ row.category }}
+                            </td>
+
+                            <td>
+                                {{ row.quantity }}
+                            </td>
+
+                            <td>
+                                KSh
+                                {{
+                                    "{:,.2f}".format(
+                                        row.price
+                                    )
+                                }}
+                            </td>
+
+                            <td>
+                                KSh
+                                {{
+                                    "{:,.2f}".format(
+                                        row.cost
+                                    )
+                                }}
+                            </td>
+
+                            <td>
+                                KSh
+                                {{
+                                    "{:,.2f}".format(
+                                        row.revenue
+                                    )
+                                }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- CHART.JS -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <script>
+
+        const dailyLabels =
+            {{ daily_labels | tojson }};
+
+        const dailyValues =
+            {{ daily_values | tojson }};
+
+
+        new Chart(
+            document.getElementById(
+                "dailyRevenueChart"
+            ),
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: dailyLabels,
+
+                    datasets: [
+
+                        {
+
+                            label: "Revenue (KSh)",
+
+                            data: dailyValues,
+
+                            tension: 0.3,
+
+                            fill: true
+
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    </script>
+    <script>
+
+function toggleCustomDates() {
+
+    const period =
+        document.getElementById("period").value;
+
+    const customDates =
+        document.getElementById("customDates");
+
+    if (period === "custom") {
+
+        customDates.style.display = "flex";
+
+    } else {
+
+        customDates.style.display = "none";
+
+    }
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    toggleCustomDates
+);
+
+</script>
+
+</body>
+
+</html>

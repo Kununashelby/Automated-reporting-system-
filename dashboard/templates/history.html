@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Report History</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+
+            <h2>
+                Reporting System
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="/">
+                Dashboard
+            </a>
+
+            <a href="/reports">
+                Reports
+            </a>
+
+            <a href="/sales">
+                Sales
+            </a>
+
+            <a
+                href="/history"
+                class="active"
+            >
+                History
+            </a>
+
+            <a href="/settings">
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+        <header class="page-header">
+
+            <div>
+
+                <h1>
+                    Report History
+                </h1>
+
+                <p>
+                    View previous automated reporting runs.
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- SUMMARY -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total Runs
+                </div>
+
+                <div class="stat-value">
+                    {{ total_runs }}
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Successful
+                </div>
+
+                <div class="stat-value">
+                    {{ successful_runs }}
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Failed
+                </div>
+
+                <div class="stat-value">
+                    {{ failed_runs }}
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- HISTORY TABLE -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Reporting Runs
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Date & Time
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Records
+                            </th>
+
+                            <th>
+                                Revenue
+                            </th>
+
+                            <th>
+                                Cost
+                            </th>
+
+                            <th>
+                                Profit
+                            </th>
+
+                            <th>
+                                Margin
+                            </th>
+
+                            <th>
+                                Error
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for row in history %}
+
+                        <tr>
+
+                            <td>
+                                {{ row.run_time }}
+                            </td>
+
+
+                            <td>
+
+                                {% if row.status == "SUCCESS" %}
+
+                                    <span class="status-badge success">
+                                        SUCCESS
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge failed">
+                                        FAILED
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ row.records_processed }}
+                            </td>
+
+
+                            <td>
+                                KSh {{ "{:,.2f}".format(row.total_revenue) }}
+                            </td>
+
+
+                            <td>
+                                KSh {{ "{:,.2f}".format(row.total_cost) }}
+                            </td>
+
+
+                            <td>
+                                KSh {{ "{:,.2f}".format(row.total_profit) }}
+                            </td>
+
+
+                            <td>
+                                {{ "{:.2f}".format(row.profit_margin) }}%
+                            </td>
+
+
+                            <td>
+
+                                {% if row.error_message %}
+
+                                    {{ row.error_message }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                style="text-align: center;"
+                            >
+                                No report history available.
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

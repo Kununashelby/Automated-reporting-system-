@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Settings</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+
+            <h2>
+                Reporting System
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="/">
+                Dashboard
+            </a>
+
+            <a href="/reports">
+                Reports
+            </a>
+
+            <a href="/sales">
+                Sales
+            </a>
+
+            <a href="/history">
+                History
+            </a>
+
+            <a
+                href="/settings"
+                class="active"
+            >
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+        <header class="page-header">
+
+            <div>
+
+                <h1>
+                    Settings
+                </h1>
+
+                <p>
+                    Configure your automated reporting system.
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- REPORT SETTINGS -->
+
+        <section class="panel settings-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Report Settings
+                </h2>
+
+                <p>
+                    Configure how reports are generated.
+                </p>
+
+            </div>
+
+
+            <form
+                method="POST"
+                action="/settings"
+            >
+
+                <div class="settings-grid">
+
+
+                    <div class="setting-item">
+
+                        <label for="report_time">
+                            Scheduled Report Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="report_time"
+                            name="report_time"
+                            value="{{ settings.report_time }}"
+                        >
+
+                        <small>
+                            Time when the automated report should run.
+                        </small>
+
+                    </div>
+
+
+                    <div class="setting-item">
+
+                        <label for="report_format">
+                            Default Report Format
+                        </label>
+
+                        <select
+                            id="report_format"
+                            name="report_format"
+                        >
+
+                            <option
+                                value="both"
+                                {% if settings.report_format == "both" %}
+                                selected
+                                {% endif %}
+                            >
+                                PDF + Excel
+                            </option>
+
+                            <option
+                                value="pdf"
+                                {% if settings.report_format == "pdf" %}
+                                selected
+                                {% endif %}
+                            >
+                                PDF Only
+                            </option>
+
+                            <option
+                                value="excel"
+                                {% if settings.report_format == "excel" %}
+                                selected
+                                {% endif %}
+                            >
+                                Excel Only
+                            </option>
+
+                        </select>
+
+                        <small>
+                            Choose the default report output.
+                        </small>
+
+                    </div>
+
+
+                    <div class="setting-item">
+
+                        <label for="email_enabled">
+                            Email Reports
+                        </label>
+
+                        <select
+                            id="email_enabled"
+                            name="email_enabled"
+                        >
+
+                            <option
+                                value="yes"
+                                {% if settings.email_enabled == "yes" %}
+                                selected
+                                {% endif %}
+                            >
+                                Enabled
+                            </option>
+
+                            <option
+                                value="no"
+                                {% if settings.email_enabled == "no" %}
+                                selected
+                                {% endif %}
+                            >
+                                Disabled
+                            </option>
+
+                        </select>
+
+                        <small>
+                            Enable or disable automated email delivery.
+                        </small>
+
+                    </div>
+
+
+                    <div class="setting-item">
+
+                        <label for="currency">
+                            Currency
+                        </label>
+
+                        <select
+                            id="currency"
+                            name="currency"
+                        >
+
+                            <option
+                                value="KSh"
+                                {% if settings.currency == "KSh" %}
+                                selected
+                                {% endif %}
+                            >
+                                KSh — Kenyan Shilling
+                            </option>
+
+                            <option
+                                value="USD"
+                                {% if settings.currency == "USD" %}
+                                selected
+                                {% endif %}
+                            >
+                                USD — US Dollar
+                            </option>
+
+                            <option
+                                value="EUR"
+                                {% if settings.currency == "EUR" %}
+                                selected
+                                {% endif %}
+                            >
+                                EUR — Euro
+                            </option>
+
+                            <option
+                                value="GBP"
+                                {% if settings.currency == "GBP" %}
+                                selected
+                                {% endif %}
+                            >
+                                GBP — British Pound
+                            </option>
+
+                        </select>
+
+                        <small>
+                            Currency used throughout the dashboard.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-actions">
+
+                    <button
+                        type="submit"
+                        class="filter-button"
+                    >
+                        Save Settings
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- SYSTEM INFORMATION -->
+
+        <section class="panel settings-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    System Information
+                </h2>
+
+            </div>
+
+
+            <div class="system-info">
+
+                <div class="info-row">
+
+                    <span>
+                        Database
+                    </span>
+
+                    <strong>
+                        SQLite
+                    </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span>
+                        Reporting Engine
+                    </span>
+
+                    <strong>
+                        Python
+                    </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span>
+                        Dashboard
+                    </span>
+
+                    <strong>
+                        Flask
+                    </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span>
+                        Report Scheduler
+                    </span>
+
+                    <strong>
+                        Active
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

@@ -219,3 +219,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Automated Reporting System runtime files
+data/*.db
+reports/*.pdf
+reports/*.xlsx
+reports/charts/*.png
