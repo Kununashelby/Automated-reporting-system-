@@ -11,6 +11,10 @@ def get_connection(db_path="data/reporting.db"):
     return sqlite3.connect(db_path)
 
 
+# ============================================================
+# DATABASE SETUP
+# ============================================================
+
 def create_database(db_path="data/reporting.db"):
     """
     Create the required database tables.
@@ -34,7 +38,14 @@ def create_database(db_path="data/reporting.db"):
             quantity INTEGER NOT NULL,
             price REAL NOT NULL,
             cost REAL NOT NULL,
-            UNIQUE(date, product, category, quantity, price, cost)
+            UNIQUE(
+                date,
+                product,
+                category,
+                quantity,
+                price,
+                cost
+            )
         )
         """
     )
@@ -54,10 +65,17 @@ def create_database(db_path="data/reporting.db"):
             total_cost REAL DEFAULT 0,
             total_profit REAL DEFAULT 0,
             profit_margin REAL DEFAULT 0,
-            error_message TEXT
+            error_message TEXT,
+            pdf_generated TEXT DEFAULT 'no',
+            excel_generated TEXT DEFAULT 'no',
+            email_sent TEXT DEFAULT 'no'
         )
         """
     )
+
+    # ========================================================
+    # SETTINGS TABLE
+    # ========================================================
 
     cursor.execute(
         """
@@ -70,6 +88,10 @@ def create_database(db_path="data/reporting.db"):
         )
         """
     )
+
+    # ========================================================
+    # DEFAULT SETTINGS
+    # ========================================================
 
     cursor.execute(
         """
@@ -93,6 +115,58 @@ def create_database(db_path="data/reporting.db"):
     connection.commit()
     connection.close()
 
+    # Upgrade existing databases
+    migrate_database(db_path)
+
+
+# ============================================================
+# DATABASE MIGRATION
+# ============================================================
+
+def migrate_database(db_path="data/reporting.db"):
+    """
+    Add new columns to existing databases
+    without deleting existing data.
+    """
+
+    connection = get_connection(db_path)
+
+    cursor = connection.cursor()
+
+    cursor.execute(
+        "PRAGMA table_info(report_history)"
+    )
+
+    existing_columns = {
+        row[1]
+        for row in cursor.fetchall()
+    }
+
+    new_columns = {
+        "pdf_generated": "TEXT DEFAULT 'no'",
+        "excel_generated": "TEXT DEFAULT 'no'",
+        "email_sent": "TEXT DEFAULT 'no'",
+    }
+
+    for column_name, column_definition in new_columns.items():
+
+        if column_name not in existing_columns:
+
+            cursor.execute(
+                f"""
+                ALTER TABLE report_history
+                ADD COLUMN {column_name}
+                {column_definition}
+                """
+            )
+
+    connection.commit()
+    connection.close()
+
+
+# ============================================================
+# SALES DATA
+# ============================================================
 
 def import_csv_to_database(
     csv_path,
@@ -193,6 +267,9 @@ def save_report_history(
     total_profit=0,
     profit_margin=0,
     error_message=None,
+    pdf_generated="no",
+    excel_generated="no",
+    email_sent="no",
     db_path="data/reporting.db"
 ):
     """
@@ -219,9 +296,12 @@ def save_report_history(
             total_cost,
             total_profit,
             profit_margin,
-            error_message
+            error_message,
+            pdf_generated,
+            excel_generated,
+            email_sent
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             run_time,
@@ -232,6 +312,9 @@ def save_report_history(
             total_profit,
             profit_margin,
             error_message,
+            pdf_generated,
+            excel_generated,
+            email_sent,
         )
     )
 
@@ -258,7 +341,10 @@ def load_report_history(
             total_cost,
             total_profit,
             profit_margin,
-            error_message
+            error_message,
+            pdf_generated,
+            excel_generated,
+            email_sent
         FROM report_history
         ORDER BY run_time DESC
     """
@@ -272,9 +358,18 @@ def load_report_history(
 
     return history
 
+
+# ============================================================
+# SETTINGS
+# ============================================================
+
 def load_settings(
     db_path="data/reporting.db"
 ):
+    """
+    Load application settings.
+    """
+
     connection = get_connection(db_path)
 
     query = """
@@ -296,6 +391,7 @@ def load_settings(
     connection.close()
 
     if row is None:
+
         return {
             "report_time": "18:00",
             "report_format": "both",
@@ -315,6 +411,10 @@ def save_settings(
     settings,
     db_path="data/reporting.db"
 ):
+    """
+    Save application settings.
+    """
+
     connection = get_connection(db_path)
 
     cursor = connection.cursor()

@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Report History</title>
+    <title>Report History | Automated Reporting System</title>
 
     <link
         rel="stylesheet"
@@ -19,21 +19,20 @@
 
 </head>
 
-
 <body>
 
+<div class="dashboard-container">
+
+    <!-- ================================================== -->
     <!-- SIDEBAR -->
+    <!-- ================================================== -->
 
     <aside class="sidebar">
 
-        <div class="sidebar-header">
-
-            <h2>
-                Reporting System
-            </h2>
-
+        <div class="sidebar-logo">
+            <h2>Reporting System</h2>
+            <p>Automated Reports</p>
         </div>
-
 
         <nav class="sidebar-nav">
 
@@ -65,7 +64,9 @@
     </aside>
 
 
-    <!-- MAIN -->
+    <!-- ================================================== -->
+    <!-- MAIN CONTENT -->
+    <!-- ================================================== -->
 
     <main class="main-content">
 
@@ -73,12 +74,10 @@
 
             <div>
 
-                <h1>
-                    Report History
-                </h1>
+                <h1>Report History</h1>
 
                 <p>
-                    View previous automated reporting runs.
+                    Track previous automated report executions.
                 </p>
 
             </div>
@@ -86,7 +85,9 @@
         </header>
 
 
-        <!-- SUMMARY -->
+        <!-- ================================================== -->
+        <!-- SUMMARY CARDS -->
+        <!-- ================================================== -->
 
         <section class="stats-grid">
 
@@ -131,19 +132,19 @@
         </section>
 
 
+        <!-- ================================================== -->
         <!-- HISTORY TABLE -->
+        <!-- ================================================== -->
 
         <section class="panel">
 
             <div class="panel-header">
 
-                <div>
+                <h2>Execution History</h2>
 
-                    <h2>
-                        Reporting Runs
-                    </h2>
-
-                </div>
+                <p>
+                    Detailed record of report executions.
+                </p>
 
             </div>
 
@@ -156,37 +157,27 @@
 
                         <tr>
 
-                            <th>
-                                Date & Time
-                            </th>
+                            <th>Date & Time</th>
 
-                            <th>
-                                Status
-                            </th>
+                            <th>Status</th>
 
-                            <th>
-                                Records
-                            </th>
+                            <th>Records</th>
 
-                            <th>
-                                Revenue
-                            </th>
+                            <th>Revenue</th>
 
-                            <th>
-                                Cost
-                            </th>
+                            <th>Cost</th>
 
-                            <th>
-                                Profit
-                            </th>
+                            <th>Profit</th>
 
-                            <th>
-                                Margin
-                            </th>
+                            <th>Margin</th>
 
-                            <th>
-                                Error
-                            </th>
+                            <th>PDF</th>
+
+                            <th>Excel</th>
+
+                            <th>Email</th>
+
+                            <th>Error</th>
 
                         </tr>
 
@@ -195,26 +186,36 @@
 
                     <tbody>
 
-                        {% for row in history %}
+                    {% if history %}
+
+                        {% for record in history %}
 
                         <tr>
 
+                            <!-- DATE -->
+
                             <td>
-                                {{ row.run_time }}
+                                {{ record.run_time }}
                             </td>
 
 
+                            <!-- STATUS -->
+
                             <td>
 
-                                {% if row.status == "SUCCESS" %}
+                                {% if record.status == "SUCCESS" %}
 
-                                    <span class="status-badge success">
+                                    <span
+                                        class="status-badge success"
+                                    >
                                         SUCCESS
                                     </span>
 
                                 {% else %}
 
-                                    <span class="status-badge failed">
+                                    <span
+                                        class="status-badge failed"
+                                    >
                                         FAILED
                                     </span>
 
@@ -223,36 +224,116 @@
                             </td>
 
 
+                            <!-- RECORDS -->
+
                             <td>
-                                {{ row.records_processed }}
+                                {{ record.records_processed }}
                             </td>
 
 
+                            <!-- REVENUE -->
+
                             <td>
-                                KSh {{ "{:,.2f}".format(row.total_revenue) }}
+                                KSh
+                                {{ "{:,.2f}".format(record.total_revenue) }}
                             </td>
 
 
+                            <!-- COST -->
+
                             <td>
-                                KSh {{ "{:,.2f}".format(row.total_cost) }}
+                                KSh
+                                {{ "{:,.2f}".format(record.total_cost) }}
                             </td>
 
 
+                            <!-- PROFIT -->
+
                             <td>
-                                KSh {{ "{:,.2f}".format(row.total_profit) }}
+                                KSh
+                                {{ "{:,.2f}".format(record.total_profit) }}
                             </td>
 
 
+                            <!-- MARGIN -->
+
                             <td>
-                                {{ "{:.2f}".format(row.profit_margin) }}%
+                                {{ "{:.2f}".format(record.profit_margin) }}%
                             </td>
 
 
+                            <!-- PDF -->
+
                             <td>
 
-                                {% if row.error_message %}
+                                {% if record.pdf_generated == "yes" %}
 
-                                    {{ row.error_message }}
+                                    <span class="output-badge generated">
+                                        ✓ Generated
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="output-badge skipped">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- EXCEL -->
+
+                            <td>
+
+                                {% if record.excel_generated == "yes" %}
+
+                                    <span class="output-badge generated">
+                                        ✓ Generated
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="output-badge skipped">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- EMAIL -->
+
+                            <td>
+
+                                {% if record.email_sent == "yes" %}
+
+                                    <span class="output-badge generated">
+                                        ✓ Sent
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="output-badge skipped">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ERROR -->
+
+                            <td>
+
+                                {% if record.error_message %}
+
+                                    <span class="error-message">
+                                        {{ record.error_message }}
+                                    </span>
 
                                 {% else %}
 
@@ -264,20 +345,24 @@
 
                         </tr>
 
-                        {% else %}
+                        {% endfor %}
+
+                    {% else %}
 
                         <tr>
 
                             <td
-                                colspan="8"
-                                style="text-align: center;"
+                                colspan="11"
+                                class="empty-state"
                             >
+
                                 No report history available.
+
                             </td>
 
                         </tr>
 
-                        {% endfor %}
+                    {% endif %}
 
                     </tbody>
 
@@ -288,6 +373,8 @@
         </section>
 
     </main>
+
+</div>
 
 </body>
 

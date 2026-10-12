@@ -23,29 +23,19 @@ from src.reporting.excel_report import generate_excel_report
 from src.reporting.email_report import send_report_email
 
 
-# ============================================================
-# CONFIGURATION
-# ============================================================
-
 DB_PATH = "data/reporting.db"
 CSV_PATH = "data/sample_sales.csv"
 
-
-# Load environment variables
 load_dotenv()
 
 
-# ============================================================
-# MAIN REPORTING SYSTEM
-# ============================================================
-
 def main():
 
-    try:
+    pdf_generated = "no"
+    excel_generated = "no"
+    email_sent = "no"
 
-        # ====================================================
-        # 1. CREATE DATABASE
-        # ====================================================
+    try:
 
         print("\n===== DATABASE SETUP =====")
 
@@ -54,7 +44,7 @@ def main():
         print("Database ready.")
 
         # ====================================================
-        # 2. LOAD SYSTEM SETTINGS
+        # SETTINGS
         # ====================================================
 
         print("\n===== LOADING SETTINGS =====")
@@ -76,20 +66,12 @@ def main():
             "KSh"
         )
 
-        print(
-            f"Report format: {report_format}"
-        )
-
-        print(
-            f"Email enabled: {email_enabled}"
-        )
-
-        print(
-            f"Currency: {currency}"
-        )
+        print(f"Report format: {report_format}")
+        print(f"Email enabled: {email_enabled}")
+        print(f"Currency: {currency}")
 
         # ====================================================
-        # 3. IMPORT NEW DATA
+        # IMPORT DATA
         # ====================================================
 
         print("\n===== IMPORTING DATA =====")
@@ -99,21 +81,28 @@ def main():
             DB_PATH
         )
 
-        print(f"New records imported: {imported}")
-        print(f"Duplicate records skipped: {skipped}")
+        print(
+            f"New records imported: {imported}"
+        )
+
+        print(
+            f"Duplicate records skipped: {skipped}"
+        )
 
         # ====================================================
-        # 4. LOAD DATA FROM DATABASE
+        # LOAD DATABASE DATA
         # ====================================================
 
         print("\n===== LOADING DATABASE DATA =====")
 
         data = load_sales_from_database(DB_PATH)
 
-        print(f"Records loaded: {len(data)}")
+        print(
+            f"Records loaded: {len(data)}"
+        )
 
         # ====================================================
-        # 5. ANALYZE SALES DATA
+        # ANALYSIS
         # ====================================================
 
         print("\n===== ANALYZING SALES DATA =====")
@@ -123,7 +112,7 @@ def main():
         print("Sales analysis completed.")
 
         # ====================================================
-        # 6. DISPLAY SALES REPORT
+        # SALES SUMMARY
         # ====================================================
 
         print("\n===== SALES REPORT =====")
@@ -159,7 +148,7 @@ def main():
         )
 
         # ====================================================
-        # 7. SALES BY PRODUCT
+        # SALES BY PRODUCT
         # ====================================================
 
         print("\n===== SALES BY PRODUCT =====")
@@ -174,7 +163,7 @@ def main():
             )
 
         # ====================================================
-        # 8. SALES BY CATEGORY
+        # SALES BY CATEGORY
         # ====================================================
 
         print("\n===== SALES BY CATEGORY =====")
@@ -189,7 +178,7 @@ def main():
             )
 
         # ====================================================
-        # 9. GENERATE CHARTS
+        # CHARTS
         # ====================================================
 
         print("\n===== GENERATING CHARTS =====")
@@ -221,23 +210,30 @@ def main():
             f"{profit_chart}"
         )
 
-        print("\nCharts generated successfully.")
+        print(
+            "\nCharts generated successfully."
+        )
 
         # ====================================================
-        # 10. GENERATE PDF REPORT
+        # PDF REPORT
         # ====================================================
 
         pdf_path = None
 
         if report_format in ("both", "pdf"):
 
-            print("\n===== GENERATING PDF REPORT =====")
+            print(
+                "\n===== GENERATING PDF REPORT ====="
+            )
 
-            pdf_path = generate_pdf_report(results)
+            pdf_path = generate_pdf_report(
+                results
+            )
+
+            pdf_generated = "yes"
 
             print(
-                f"PDF report: "
-                f"{pdf_path}"
+                f"PDF report: {pdf_path}"
             )
 
             print(
@@ -251,20 +247,25 @@ def main():
             )
 
         # ====================================================
-        # 11. GENERATE EXCEL REPORT
+        # EXCEL REPORT
         # ====================================================
 
         excel_path = None
 
         if report_format in ("both", "excel"):
 
-            print("\n===== GENERATING EXCEL REPORT =====")
+            print(
+                "\n===== GENERATING EXCEL REPORT ====="
+            )
 
-            excel_path = generate_excel_report(results)
+            excel_path = generate_excel_report(
+                results
+            )
+
+            excel_generated = "yes"
 
             print(
-                f"Excel report: "
-                f"{excel_path}"
+                f"Excel report: {excel_path}"
             )
 
             print(
@@ -278,12 +279,14 @@ def main():
             )
 
         # ====================================================
-        # 12. SEND REPORT BY EMAIL
+        # EMAIL
         # ====================================================
 
         if email_enabled == "yes":
 
-            print("\n===== SENDING EMAIL =====")
+            print(
+                "\n===== SENDING EMAIL ====="
+            )
 
             sender_email = os.getenv(
                 "EMAIL_ADDRESS"
@@ -297,45 +300,56 @@ def main():
                 "REPORT_RECIPIENT"
             )
 
-            # Check email configuration
             if not sender_email:
+
                 raise ValueError(
                     "EMAIL_ADDRESS is missing from .env"
                 )
 
             if not sender_password:
+
                 raise ValueError(
                     "EMAIL_PASSWORD is missing from .env"
                 )
 
             if not recipient_email:
+
                 raise ValueError(
                     "REPORT_RECIPIENT is missing from .env"
                 )
 
-            # Build available attachments
             attachments = []
 
             if pdf_path:
-                attachments.append(pdf_path)
+
+                attachments.append(
+                    pdf_path
+                )
 
             if excel_path:
-                attachments.append(excel_path)
 
-            # Build report description
+                attachments.append(
+                    excel_path
+                )
+
             generated_reports = []
 
             if pdf_path:
-                generated_reports.append("PDF")
+
+                generated_reports.append(
+                    "PDF"
+                )
 
             if excel_path:
-                generated_reports.append("Excel")
+
+                generated_reports.append(
+                    "Excel"
+                )
 
             report_description = " and ".join(
                 generated_reports
             )
 
-            # Send email
             send_report_email(
                 sender_email=sender_email,
                 sender_password=sender_password,
@@ -365,7 +379,11 @@ Automated Reporting System
                 attachments=attachments,
             )
 
-            print("\nEmail sent successfully.")
+            email_sent = "yes"
+
+            print(
+                "\nEmail sent successfully."
+            )
 
         else:
 
@@ -379,24 +397,33 @@ Automated Reporting System
             )
 
         # ====================================================
-        # 13. SAVE SUCCESS HISTORY
+        # SAVE HISTORY
         # ====================================================
 
         save_report_history(
             status="SUCCESS",
             records_processed=len(data),
-            total_revenue=results["total_revenue"],
-            total_cost=results["total_cost"],
-            total_profit=results["total_profit"],
-            profit_margin=results["profit_margin"],
+            total_revenue=results[
+                "total_revenue"
+            ],
+            total_cost=results[
+                "total_cost"
+            ],
+            total_profit=results[
+                "total_profit"
+            ],
+            profit_margin=results[
+                "profit_margin"
+            ],
+            pdf_generated=pdf_generated,
+            excel_generated=excel_generated,
+            email_sent=email_sent,
             db_path=DB_PATH,
         )
 
-        print("\nReport history saved.")
-
-        # ====================================================
-        # 14. COMPLETE
-        # ====================================================
+        print(
+            "\nReport history saved."
+        )
 
         print("\n================================")
         print("REPORTING PROCESS COMPLETED")
@@ -406,13 +433,13 @@ Automated Reporting System
 
     except Exception as error:
 
-        # ====================================================
-        # SAVE FAILURE HISTORY
-        # ====================================================
-
+        # Save partial execution state
         save_report_history(
             status="FAILED",
             error_message=str(error),
+            pdf_generated=pdf_generated,
+            excel_generated=excel_generated,
+            email_sent=email_sent,
             db_path=DB_PATH,
         )
 
@@ -420,16 +447,12 @@ Automated Reporting System
         print("REPORTING PROCESS FAILED")
         print("================================")
 
-        print(f"Error: {error}")
+        print(
+            f"Error: {error}"
+        )
 
-        # Re-raise the error so the scheduler
-        # can also detect the failure.
         raise
 
-
-# ============================================================
-# RUN APPLICATION
-# ============================================================
 
 if __name__ == "__main__":
     main()
